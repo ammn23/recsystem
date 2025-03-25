@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Recipe Recommendation System</h1>
+    <form id="query-form">
+        <input type="text" id="query" placeholder="Enter your wish">
+        <button type="submit">Get Recommendations</button>
+    </form>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById("query-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let query = document.getElementById("query").value;
+            fetch("/recommend", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultsDiv = document.getElementById("results");
+                resultsDiv.innerHTML = "<h2>Recommendations:</h2>";
+                data.forEach(recipe => {
+                    resultsDiv.innerHTML += `<p><a href="/recipe/${encodeURIComponent(recipe.name)}">${recipe.name}</a> - ${recipe.description} (Similarity: ${recipe.similarity.toFixed(2)})</p>`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
